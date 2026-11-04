@@ -13,22 +13,76 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ☕ Configurar Java
+        id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 🚀 Generar y compilar APK con Bubblewrap Action
-        uses: AlvarCart/bubblewrap-action@main
+      - name: 🟢 Configurar Node.js
+        uses: actions/setup-node@v4
         with:
-          manifest-url: 'https://bustosmartin181-dotcom.github.io/ProfesoraMariela/manifest.json'
-          application-id: 'com.github.bustosmartin181dotcom.planilladocente'
-          name: 'Planilla Docente'
-          short-name: 'Planilla'
-          theme-color: '#2f6f5e'
-          background-color: '#faf8f5'
-          start-url: '/ProfesoraMariela/'
-          icon-url: 'https://bustosmartin181-dotcom.github.io/ProfesoraMariela/icon-512.png'
+          node-version: '20'
+
+      - name: 📦 Instalar Bubblewrap y herramientas
+        run: |
+          npm install -g @bubblewrap/cli
+
+      - name: 🚀 Generar y compilar APK sin interacción
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
+        run: |
+          # Creamos un archivo de respuestas automatizadas para que Bubblewrap no pregunte nada en pantalla
+          cat << EOF > input-answers.json
+          {
+            "manifestUrl": "https://bustosmartin181-dotcom.github.io/ProfesoraMariela/manifest.json",
+            "appId": "com.github.bustosmartin181dotcom.planilladocente",
+            "appName": "Planilla Docente",
+            "appShortName": "Planilla",
+            "appDescription": "Planilla Docente",
+            "themeColor": "#2f6f5e",
+            "backgroundColor": "#faf8f5",
+            "startUrl": "/ProfesoraMariela/",
+            "display": "standalone",
+            "orientation": "any",
+            "iconUrl": "https://bustosmartin181-dotcom.github.io/ProfesoraMariela/icon-512.png",
+            "maskableIconUrl": "https://bustosmartin181-dotcom.github.io/ProfesoraMariela/icon-512.png",
+            "monochromeIconUrl": "",
+            "shortcuts": [],
+            "signingKey": {
+              "path": "android.keystore",
+              "alias": "android"
+            },
+            "appVersion": "1.0.0",
+            "appVersionCode": 1,
+            "generatesManifest": true,
+            "webManifestUrl": "https://bustosmartin181-dotcom.github.io/ProfesoraMariela/manifest.json",
+            "sourceCodeUrl": "",
+            "protocolHandlers": [],
+            "allowPermissions": [],
+            "appCategory": "productivity",
+            "fallbackType": "customtab",
+            "features": {},
+            "alphaCodepath": false,
+            "navigationColor": "#2f6f5e",
+            "navigationColorDark": "#14201d",
+            "navigationDividerColor": "#2f6f5e",
+            "navigationDividerColorDark": "#14201d",
+            "splashScreenFadeOutDuration": 300,
+            "generatorApp": "bubblewrap-cli",
+            "minSdkVersion": 21,
+            "targetSdkVersion": 33,
+            "compileSdkVersion": 33,
+            "enableNotifications": false,
+            "useBrowser": "customTabs",
+            "isChromeOSOnly": false,
+            "fullScreen": false
+          }
+          EOF
+
+          # Inicializamos el proyecto pasándole las respuestas automáticas y la ruta del JDK
+          bubblewrap init --manifest input-answers.json --jdkPath "$JAVA_HOME"
+          bubblewrap build --jdkPath "$JAVA_HOME"
 
       - name: 💾 Subir APK como artefacto
         uses: actions/upload-artifact@v4
