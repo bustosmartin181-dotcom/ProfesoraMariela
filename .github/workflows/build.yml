@@ -18,26 +18,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 🟢 Configurar Node.js
-        uses: actions/setup-node@v4
+      - name: 🚀 Generar y compilar APK con Bubblewrap Action
+        uses: AlvarCart/bubblewrap-action@main
         with:
-          node-version: '20'
-
-      - name: 📦 Instalar PWABuilder CLI (Herramienta oficial sin interrupciones)
-        run: npm install -g @pwabuilder/pwapack
-
-      - name: 🚀 Construir APK automáticamente
-        run: |
-          # Genera el paquete para Android de forma totalmente desatendida
-          pwapack generate --manifest https://bustosmartin181-dotcom.github.io/ProfesoraMariela/manifest.json --platforms android --output ./android-app
-
-      - name: 📦 Compilar APK con Gradle
-        run: |
-          cd android-app/android
-          chmod +x gradlew
-          ./gradlew assembleRelease
-          # Copiar el APK resultante a la raíz
-          cp app/build/outputs/apk/release/app-release-unsigned.apk ../../app-release-signed.apk || cp app/build/outputs/apk/debug/app-release-debug.apk ../../app-release-signed.apk
+          manifest-url: 'https://bustosmartin181-dotcom.github.io/ProfesoraMariela/manifest.json'
+          application-id: 'com.github.bustosmartin181dotcom.planilladocente'
+          name: 'Planilla Docente'
+          short-name: 'Planilla'
+          theme-color: '#2f6f5e'
+          background-color: '#faf8f5'
+          start-url: '/ProfesoraMariela/'
+          icon-url: 'https://bustosmartin181-dotcom.github.io/ProfesoraMariela/icon-512.png'
 
       - name: 💾 Subir APK como artefacto
         uses: actions/upload-artifact@v4
