@@ -31,9 +31,8 @@ jobs:
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
         run: |
-          # Le pasamos la respuesta "N" y luego la ruta de Java automáticamente con printf
-          printf "N\n%s\n" "$JAVA_HOME" | bubblewrap update --force
-          bubblewrap build
+          # Inicializa y compila pasando las rutas de forma no interactiva
+          bubblewrap build --manifest ./twa-manifest.json --jdkPath "$JAVA_HOME" || bubblewrap update --force --jdkPath "$JAVA_HOME" && bubblewrap build --jdkPath "$JAVA_HOME"
 
       - name: 💾 Subir APK como artefacto
         uses: actions/upload-artifact@v4
