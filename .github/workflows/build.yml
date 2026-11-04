@@ -31,8 +31,9 @@ jobs:
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
         run: |
-          # Inicializa y compila pasando las rutas de forma no interactiva
-          bubblewrap build --manifest ./twa-manifest.json --jdkPath "$JAVA_HOME" || bubblewrap update --force --jdkPath "$JAVA_HOME" && bubblewrap build --jdkPath "$JAVA_HOME"
+          # Inicializa el proyecto de forma automática usando el manifest web existente y compila sin interactividad
+          bubblewrap init --manifest https://bustosmartin181-dotcom.github.io/ProfesoraMariela/manifest.json --directory . --skipValidation --jdkPath "$JAVA_HOME" || true
+          bubblewrap build --jdkPath "$JAVA_HOME"
 
       - name: 💾 Subir APK como artefacto
         uses: actions/upload-artifact@v4
