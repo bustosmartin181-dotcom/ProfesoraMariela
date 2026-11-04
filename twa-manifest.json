@@ -1,0 +1,29 @@
+{
+  "host": "bustosmartin181-dotcom.github.io",
+  "name": "Planilla Docente",
+  "shortName": "Planilla",
+  "startUrl": "/ProfesoraMariela/",
+  "display": "standalone",
+  "themeColor": "#2f6f5e",
+  "backgroundColor": "#faf8f5",
+  "navigationColor": "#2f6f5e",
+  "navigationColorDark": "#14201d",
+  "navigationDividerColor": "#2f6f5e",
+  "navigationDividerColorDark": "#14201d",
+  "appId": "com.github.bustosmartin181dotcom.planilladocente",
+  "launcherName": "Planilla",
+  "packageId": "com.github.bustosmartin181dotcom.planilladocente",
+  "signingKey": {
+    "path": "android.keystore",
+    "alias": "android"
+  },
+  "iconUrl": "https://bustosmartin181-dotcom.github.io/ProfesoraMariela/icon-512.png",
+  "maskableIconUrl": "https://bustosmartin181-dotcom.github.io/ProfesoraMariela/icon-512.png",
+  "webManifestUrl": "https://bustosmartin181-dotcom.github.io/ProfesoraMariela/manifest.json",
+  "generatorApp": "bubblewrap-cli",
+  "minSdkVersion": 21,
+  "targetSdkVersion": 33,
+  "enableNotifications": false,
+  "shortcuts": [],
+  "shareTarget": {}
+}
