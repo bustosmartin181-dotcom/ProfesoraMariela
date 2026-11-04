@@ -28,12 +28,14 @@ jobs:
 
       - name: 🚀 Construir APK
         run: |
-          bubblewrap update --force
+          # Le pasamos "N" automáticamente a la pregunta del JDK usando echo
+          echo "N" | bubblewrap update --force
           bubblewrap build
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
 
       - name: 💾 Subir APK como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: app-release-signed
           path: app-release-signed.apk
-          
