@@ -1,0 +1,56 @@
+name: Build y publicar en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bajar el código
+        uses: actions/checkout@v4
+
+      - name: Verificar que estén todos los archivos
+        run: |
+          for f in index.html manifest.json sw.js icon-192.png icon-512.png; do
+            test -f "$f" || { echo "Falta el archivo: $f"; exit 1; }
+          done
+
+      - name: Verificar que manifest.json sea válido
+        run: python3 -m json.tool manifest.json > /dev/null
+
+      - name: Armar la carpeta a publicar
+        run: |
+          mkdir _site
+          cp index.html manifest.json sw.js icon-192.png icon-512.png _site/
+          touch _site/.nojekyll
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir el sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
