@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ☕ Configurar Java
+        id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -27,15 +28,16 @@ jobs:
         run: npm install -g @bubblewrap/cli
 
       - name: 🚀 Construir APK
-        run: |
-          # Le pasamos "N" automáticamente a la pregunta del JDK usando echo
-          echo "N" | bubblewrap update --force
-          bubblewrap build
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
+        run: |
+          # Le pasamos la respuesta "N" y luego la ruta de Java automáticamente con printf
+          printf "N\n%s\n" "$JAVA_HOME" | bubblewrap update --force
+          bubblewrap build
 
       - name: 💾 Subir APK como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: app-release-signed
           path: app-release-signed.apk
+          
