@@ -13,7 +13,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ☕ Configurar Java
-        id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -24,16 +23,21 @@ jobs:
         with:
           node-version: '20'
 
-      - name: 📦 Instalar Bubblewrap
-        run: npm install -g @bubblewrap/cli
+      - name: 📦 Instalar PWABuilder CLI (Herramienta oficial sin interrupciones)
+        run: npm install -g @pwabuilder/pwapack
 
-      - name: 🚀 Construir APK
-        env:
-          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
+      - name: 🚀 Construir APK automáticamente
         run: |
-          # Inicializa el proyecto de forma automática usando el manifest web existente y compila sin interactividad
-          bubblewrap init --manifest https://bustosmartin181-dotcom.github.io/ProfesoraMariela/manifest.json --directory . --skipValidation --jdkPath "$JAVA_HOME" || true
-          bubblewrap build --jdkPath "$JAVA_HOME"
+          # Genera el paquete para Android de forma totalmente desatendida
+          pwapack generate --manifest https://bustosmartin181-dotcom.github.io/ProfesoraMariela/manifest.json --platforms android --output ./android-app
+
+      - name: 📦 Compilar APK con Gradle
+        run: |
+          cd android-app/android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+          # Copiar el APK resultante a la raíz
+          cp app/build/outputs/apk/release/app-release-unsigned.apk ../../app-release-signed.apk || cp app/build/outputs/apk/debug/app-release-debug.apk ../../app-release-signed.apk
 
       - name: 💾 Subir APK como artefacto
         uses: actions/upload-artifact@v4
