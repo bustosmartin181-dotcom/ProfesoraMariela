@@ -169,6 +169,7 @@ return `<tr>${r}<td class="pm" id="av_${s.id}_gen"><b>${f1(o.gen)}</b></td><td>$
 const n=c.items.filter(i=>i.per===per).length;
 return `<div class="card"><h3>Planilla de notas</h3><small>${PER[per]} · acá ves todas las notas de cada alumno, actividad por actividad. Podés escribir o corregir una nota directamente en la tabla. Deslizá hacia los costados para ver más columnas. «Prom.» es el promedio de cada tipo y «Final» es el promedio de esos promedios. Tocá el título de una actividad para ir a su pestaña.</small>
 ${n?'':'<p class="mu">Todavía no hay actividades en este período. Creá una en TP, Escritas, Orales o Carpeta.</p>'}
+<div class="row" style="margin-top:10px"><button class="b p" onclick="expMenu()">📊 Exportar a Excel (para imprimir)</button></div>
 <div class="wrap" style="margin-top:10px"><table class="pt"><tr>${h1}</tr><tr>${h2}</tr>${rows}</table></div></div>`}
 
 /* ---------- informes ---------- */
@@ -306,11 +307,11 @@ ${sn.map(x=>`<div class="st"><span class="nm">${fdt(x.t)}</span><button class="b
 <p><small>Última copia en archivo: ${L?fdt(L):'nunca'}</small></p>
 <small>Recordarme hacer una copia:</small><select onchange="S.cfg.remind=+this.value;save()">${[[0,'Nunca'],[7,'Cada 7 días'],[15,'Cada 15 días'],[30,'Cada 30 días']].map(o=>`<option value="${o[0]}" ${S.cfg.remind===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>
 <div class="card"><h3>Copia en Google Drive</h3><small>Todavía no está activa. Es el próximo paso: iniciar sesión con la cuenta de Google de Mariela y que la copia se suba sola a su Drive.</small></div>
-<div class="card"><h3>Copia por texto</h3><small>Alternativa si no podés guardar archivos.</small><div class="row" style="margin-top:8px"><button class="b" onclick="backup()">Ver y pegar texto</button></div></div>${perfCard()}${donarCard()}${verCard()}</main>`}
+<div class="card"><h3>Copia por texto</h3><small>Alternativa si no podés guardar archivos.</small><div class="row" style="margin-top:8px"><button class="b" onclick="backup()">Ver y pegar texto</button></div></div>${perfCard()}${conoceCard()}${donarCard()}${verCard()}</main>`}
 
 /* ---------- versión y actualizaciones ---------- */
-const APP_VERSION='2.0.9',APP_DATE='05/11/2026';
-const CHANGELOG=[['2.0.9','05/11/2026','Ahora lee fotos en formato HEIC (las del Samsung) convirtiéndolas solas.'],['2.0.8','05/11/2026','Lectura de PDF más robusta y los errores de lectura ahora muestran el detalle técnico.'],['2.0.7','05/11/2026','Ventanita «Ayudemos al creador» con alias para copiar y botón para abrir Mercado Pago.'],['2.0.6','06/11/2026','Agregar alumnos desde PDF, Word, Excel, LibreOffice, RTF, HTML, texto y fotos.'],['2.0.5','06/11/2026','Agregar alumnos: se puede elegir una foto de la galería o un archivo de texto, además de sacar la foto con la cámara.'],['2.0.4','06/11/2026','Corrige pantalla en blanco al abrir la app instalada.'],['2.0.3','06/11/2026','Ícono nuevo y APK con firma fija para poder actualizar encima.'],['2.0.2','06/11/2026','El lector de listas ignora títulos y números, y muestra una revisión con tildes antes de agregar alumnos.'],['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
+const APP_VERSION='2.1.1',APP_DATE='05/11/2026';
+const CHANGELOG=[['2.1.1','05/11/2026','Sección «Conocé la app» (escondida en Ajustes) y curso de ejemplo para probar o sacar capturas.'],['2.1.0','05/11/2026','Exportar notas y promedios a Excel para imprimir (un curso o todos) y dictar alumnos con el micrófono del teclado.'],['2.0.9','05/11/2026','Ahora lee fotos en formato HEIC (las del Samsung) convirtiéndolas solas.'],['2.0.8','05/11/2026','Lectura de PDF más robusta y los errores de lectura ahora muestran el detalle técnico.'],['2.0.7','05/11/2026','Ventanita «Ayudemos al creador» con alias para copiar y botón para abrir Mercado Pago.'],['2.0.6','06/11/2026','Agregar alumnos desde PDF, Word, Excel, LibreOffice, RTF, HTML, texto y fotos.'],['2.0.5','06/11/2026','Agregar alumnos: se puede elegir una foto de la galería o un archivo de texto, además de sacar la foto con la cámara.'],['2.0.4','06/11/2026','Corrige pantalla en blanco al abrir la app instalada.'],['2.0.3','06/11/2026','Ícono nuevo y APK con firma fija para poder actualizar encima.'],['2.0.2','06/11/2026','El lector de listas ignora títulos y números, y muestra una revisión con tildes antes de agregar alumnos.'],['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
 
 /* ---------- Ayudemos al creador ---------- */
 const CREADOR={nombre:'Martín Enrique Bustos',alias:'MartinchoLujanino'};
@@ -328,6 +329,90 @@ function donar(){dlg('☕ Ayudemos al creador',`<p>Esta app la hizo <b>${CREADOR
 <div class="row" style="margin-top:12px"><button class="b" onclick="copiarAlias()">Copiar alias</button><button class="b p" onclick="abrirMP()">Abrir Mercado Pago</button></div>
 <p id="dmsg" style="margin:10px 0 0;font-size:.9rem"></p>`)}
 function donarCard(){return `<div class="card"><h3>☕ Ayudemos al creador</h3><small>App gratuita y sin anuncios. Si te sirve, podés colaborar.</small><div class="row"><button class="b p" onclick="donar()">Ver alias y colaborar</button></div></div>`}
+
+/* ---------- exportar a Excel (.xlsx propio, sin internet) ---------- */
+const CRCT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u){let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRCT[(c^u[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+function zipStore(files){const te=new TextEncoder(),parts=[],cen=[];let off=0;
+ const w16=(a,v)=>a.push(v&255,(v>>8)&255),w32=(a,v)=>a.push(v&255,(v>>8)&255,(v>>16)&255,(v>>>24)&255);
+ files.forEach(f=>{const nm=te.encode(f.name),d=te.encode(f.data),crc=crc32(d);
+  const h=[];w32(h,0x04034b50);w16(h,20);w16(h,0x0800);w16(h,0);w16(h,0);w16(h,0x21);w32(h,crc);w32(h,d.length);w32(h,d.length);w16(h,nm.length);w16(h,0);
+  parts.push(Uint8Array.from(h),nm,d);
+  const e=[];w32(e,0x02014b50);w16(e,20);w16(e,20);w16(e,0x0800);w16(e,0);w16(e,0);w16(e,0x21);w32(e,crc);w32(e,d.length);w32(e,d.length);w16(e,nm.length);w16(e,0);w16(e,0);w16(e,0);w16(e,0);w32(e,0);w32(e,off);
+  cen.push(Uint8Array.from(e),nm);off+=h.length+nm.length+d.length});
+ let cl=0;cen.forEach(x=>cl+=x.length);const end=[];w32(end,0x06054b50);w16(end,0);w16(end,0);w16(end,files.length);w16(end,files.length);w32(end,cl);w32(end,off);w16(end,0);
+ const all=parts.concat(cen,[Uint8Array.from(end)]);let n=0;all.forEach(x=>n+=x.length);const out=new Uint8Array(n);let p=0;all.forEach(x=>{out.set(x,p);p+=x.length});return out}
+const xe=v=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'');
+const colL=n=>{let r='';n++;while(n>0){const m=(n-1)%26;r=String.fromCharCode(65+m)+r;n=Math.floor((n-1)/26)}return r};
+function xlsxBuild(sheets){
+ // celdas: {v, b:negrita, h:encabezado, n:true si es número}
+ const used=new Set();const names=sheets.map((sh,i)=>{let n=String(sh.name).replace(/[\[\]:*?\/\\]/g,' ').trim().slice(0,31)||'Hoja'+(i+1);let b=n,k=2;while(used.has(n.toLowerCase())){n=b.slice(0,28)+' '+k++}used.add(n.toLowerCase());return n});
+ const sx=sheets.map(sh=>{const nc=Math.max(...sh.rows.map(r=>r.length),1);
+  const cols=Array.from({length:nc},(_,i)=>`<col min="${i+1}" max="${i+1}" width="${i===0?(sh.w0||34):(sh.w||13)}" customWidth="1"/>`).join('');
+  const rows=sh.rows.map((r,ri)=>`<row r="${ri+1}">`+r.map((c,ci)=>{if(c==null||c==='')return'';const ref=colL(ci)+(ri+1);const st=c.h?1:c.b?2:c.t?3:0;
+   if(typeof c.v==='number'&&isFinite(c.v))return`<c r="${ref}" s="${st}"><v>${c.v}</v></c>`;
+   return`<c r="${ref}" s="${st}" t="inlineStr"><is><t xml:space="preserve">${xe(c.v)}</t></is></c>`}).join('')+'</row>').join('');
+  return`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0"><pane xSplit="1" ySplit="${sh.hdr||1}" topLeftCell="B${(sh.hdr||1)+1}" activePane="bottomRight" state="frozen"/></sheetView></sheetViews><cols>${cols}</cols><sheetData>${rows}</sheetData><pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>`});
+ const styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF2F6F5E"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFBBBBBB"/></left><right style="thin"><color rgb="FFBBBBBB"/></right><top style="thin"><color rgb="FFBBBBBB"/></top><bottom style="thin"><color rgb="FFBBBBBB"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+ const files=[{name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+sx.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')+'</Types>'},
+ {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+ {name:'xl/workbook.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'+names.map((n,i)=>`<sheet name="${xe(n).replace(/"/g,'&quot;')}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')+'</sheets></workbook>'},
+ {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+sx.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')+`<Relationship Id="rId${sx.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
+ {name:'xl/styles.xml',data:styles}].concat(sx.map((d,i)=>({name:`xl/worksheets/sheet${i+1}.xml`,data:d})));
+ return zipStore(files)}
+function sheetNotas(c,per){
+ const cols=GT.map(t=>({t,a:acts(c,t,per)})).filter(g=>g.a.length);
+ const head=[{v:'Alumno',h:1}];cols.forEach(g=>{g.a.forEach(i=>head.push({v:GN[g.t].replace('Trabajos prácticos','TP')+': '+i.title+' ('+fmt(i.date)+')',h:1}));head.push({v:'Prom. '+GN[g.t],h:1})});head.push({v:'Promedio final',h:1},{v:'Asistencia',h:1});
+ const rows=[[{v:c.name+' · '+(c.school||'')+(c.turno?' · '+c.turno:'')+' · '+PER[per],t:1}],head];
+ c.students.forEach((s,k)=>{const o=avgs(c,s.id,per);const r=[{v:(k+1)+'. '+s.name}];
+  cols.forEach(g=>{g.a.forEach(i=>{const v=i.sc[s.id];r.push(v==null||v===''?{v:''}:{v:+v})});r.push(o[g.t]==null?{v:''}:{v:Math.round(o[g.t]*100)/100,b:1})});
+  r.push(o.gen==null?{v:''}:{v:Math.round(o.gen*100)/100,b:1},{v:attPct(c,s.id)});rows.push(r)});
+ return{name:c.name+' '+per,rows,hdr:2}}
+async function saveXlsx(sheets,fname){
+ const u8=xlsxBuild(sheets);
+ if(isNative()){try{let b='';for(let i=0;i<u8.length;i+=8192)b+=String.fromCharCode.apply(null,u8.subarray(i,i+8192));
+   const FS=Capacitor.registerPlugin('Filesystem'),Sh=Capacitor.registerPlugin('Share');
+   const r=await FS.writeFile({path:fname,data:btoa(b),directory:'CACHE'});await Sh.share({title:fname,url:r.uri});return}catch(e){if(/cancel/i.test(String((e&&e.message)||e)))return;throw e}}
+ const bl=new Blob([u8],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const f=new File([bl],fname,{type:bl.type});
+ if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:fname});return}catch(e){if(e&&e.name==='AbortError')return}}
+ const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=fname;document.body.appendChild(a);a.click();a.remove()}
+function expXls(todos){const per=S.period;const list=todos?S.courses:[C()];
+ const sh=list.filter(c=>c.students.length).map(c=>sheetNotas(c,per));
+ if(!sh.length)return dlg('Nada para exportar','Todavía no hay alumnos cargados.');
+ saveXlsx(sh,(todos?'notas-todos-los-cursos-':'notas-'+(C().name||'curso').replace(/[^\w]+/g,'-')+'-')+per+'-'+today()+'.xlsx').catch(e=>dlg('No se pudo exportar','No pude armar el archivo de Excel.<br><small style="opacity:.7">Detalle técnico: '+esc(String((e&&e.message)||e))+'</small>'))}
+function expMenu(){dlg('Exportar a Excel',`<small>Se arma una planilla con todas las notas, los promedios y la asistencia de <b>${PER[S.period]}</b>, lista para imprimir en hoja A4 apaisada. Después elegís dónde guardarla o con qué app abrirla.</small><div class="col" style="margin-top:10px"><button class="b p" onclick="closeD();expXls(false)">📊 Este curso</button><button class="b p" onclick="closeD();expXls(true)">📊 Los ${S.courses.length} cursos (una hoja por curso)</button></div>`)}
+
+/* ---------- dictar alumnos ---------- */
+function dictSt(){dlg('🎤 Dictar alumnos',`<small>1) Tocá el cuadro de abajo. 2) Tocá el <b>micrófono 🎤 del teclado</b> y dictá los nombres. 3) Entre un alumno y el otro decí <b>«punto»</b> (o tocá Enter). Ejemplo: <i>«Gómez Juan punto Pérez María punto»</i>. Después podés revisar y corregir todo antes de agregar.</small><br><textarea id="f1" rows="8" placeholder="Acá aparece lo que dictás..."></textarea>`,'Revisar',()=>{const t=val('f1').replace(/\s+punto(?=\s|$|[.,;])/gi,'\n').replace(/[.;]+/g,'\n');const p=parseNamesEx(t);setTimeout(()=>review(p.items,p.dropped),0)});setTimeout(()=>{const e=$('#f1');if(e)e.focus()},150)}
+
+/* ---------- Conocé la app (escondida en Ajustes) + curso de ejemplo ---------- */
+const FEATS=[['📋','Todo en un solo lugar','Alumnos, asistencia, trabajos prácticos, escritas, orales y carpeta de cada curso, sin hojas sueltas.'],
+['📷','Cargá la lista con una foto','Sacale una foto a la lista impresa, o elegí un PDF, Word o Excel, y la app arma el curso. La app te muestra los nombres para que los revises antes de agregarlos.'],
+['🎤','Dictá los alumnos','Con el micrófono del teclado dictás los nombres y la app los ordena. Para los que no quieren escribir.'],
+['✅','Asistencia en un toque','Tocá a cada alumno para marcar presente, ausente, tarde o justificado.'],
+['📝','Notas y promedios','Cargás las notas de cada actividad y la app calcula el promedio de cada tipo y el final. Ves todas las notas juntas en una sola planilla.'],
+['📄','Informes por alumno','Escribí observaciones de cada alumno y se guardan solas.'],
+['💰','Cobros sin dudas','Anotá quién pagó las fotocopias o resmas, aunque pague en partes. Siempre sabés quién debe y cuánto.'],
+['📊','Exportá a Excel','Sacá las notas y promedios en una planilla lista para imprimir en hoja A4.'],
+['💾','Se guarda solo','No hay botón «Guardar». Además, la app hace copias automáticas cada vez que la cerrás.'],
+['🔒','Tus datos son tuyos','Todo queda en tu teléfono. Sin publicidad, sin suscripción y sin cuenta.']];
+function conoceCard(){return `<details class="card"><summary>ℹ️ Conocé la app</summary><small>Un repaso de todo lo que puede hacer Planilla Docente.</small>
+${FEATS.map(f=>`<div class="st" style="align-items:flex-start;gap:12px"><span style="font-size:1.6rem">${f[0]}</span><div><b>${f[1]}</b><br><small>${f[2]}</small></div></div>`).join('')}
+<hr style="border:0;border-top:1px solid var(--bd);margin:14px 0"><b>Curso de ejemplo</b><br><small>Crea un curso con alumnos inventados, notas, asistencia y cobros para que pruebes la app o saques capturas sin mostrar alumnos reales. Se borra con un toque cuando termines.</small>
+<div class="row" style="margin-top:8px"><button class="b" onclick="demoAdd()">Crear curso de ejemplo</button><button class="b" onclick="demoDel()">Borrar curso de ejemplo</button></div></details>`}
+function demoAdd(){if(S.courses.some(c=>c.demo))return dlg('Ya existe','El curso de ejemplo ya está creado. Lo encontrás en «Cursos».');
+ const N=['Agustina Benítez','Bautista Cardozo','Camila Domínguez','Dante Escudero','Emma Fernández','Facundo Gil','Guadalupe Herrera','Ignacio Juárez','Julieta Lucero','Lautaro Morales','Martina Navarro','Nicolás Ortega','Olivia Paredes','Santiago Quiroga','Valentina Rojas'];
+ const st=N.map((n,i)=>({id:uid(),name:n,cond:i===5?'REC':i===12?'DISC':'AR'}));
+ const r=(i,j,min)=>Math.min(10,min+((i*7+j*3)%(11-min)));
+ const mk=(type,title,date,min,skip)=>({id:uid(),type,title,date,per:'2c',sc:Object.fromEntries(st.map((x,i)=>[x.id,r(i,title.length,min)]).filter((_,i)=>i!==skip))});
+ const c={id:uid(),demo:1,name:'Ejemplo 3.º A',school:'Escuela de ejemplo',turno:'Mañana',students:st,att:{},
+  items:[mk('tp','TP 1 · Mapas','2026-09-14',6,3),mk('tp','TP 2 · Relieve','2026-10-05',5,9),mk('esc','Evaluación 1','2026-10-19',4,-1),mk('ora','Exposición oral','2026-10-26',6,-1),mk('car','Carpeta','2026-11-02',6,-1)],cob:[]};
+ [['2026-10-26'],['2026-11-02'],['2026-11-03']].forEach(([d])=>{c.att[d]={};st.forEach((x,i)=>{c.att[d][x.id]=(i*3+d.length+d.charCodeAt(9))%7===0?'A':(i+d.charCodeAt(9))%9===0?'T':'P'})});
+ const k={id:uid(),title:'Fotocopias 2.º cuatrimestre',amt:2000,date:'2026-10-01',pays:{},ex:{},cu:{},buys:[{id:uid(),t:'Resma de papel',m:9000,d:'2026-10-02'}]};
+ st.forEach((x,i)=>{if(i%5===1)return;const m=i%3===0?2000:i%3===1?1000:2000;k.pays[x.id]=[{id:uid(),d:'2026-10-0'+(2+i%6),m,n:'',t:Date.now()}];if(i%3===1)k.pays[x.id].push({id:uid(),d:'2026-10-20',m:1000,n:'',t:Date.now()})});
+ c.cob.push(k);S.courses.push(c);save();view='home';cur=null;R();dlg('Listo','Se creó el curso <b>Ejemplo 3.º A</b> con alumnos inventados. Lo ves en «Cursos».')}
+function demoDel(){const n=S.courses.filter(c=>c.demo).length;if(!n)return dlg('Sin curso de ejemplo','No hay ningún curso de ejemplo para borrar.');
+ dlg('Borrar curso de ejemplo','Se borra solo el curso de ejemplo. Tus cursos reales no se tocan.','Borrar',()=>{S.courses=S.courses.filter(c=>!c.demo);if(cur&&!C()){cur=null}save();R()})}
 function verCard(){return `<div class="card"><h3>Versión de la app</h3><p><b>Versión ${APP_VERSION}</b> · ${APP_DATE}</p><small>Novedades:</small><ul style="margin:6px 0;padding-left:20px">${CHANGELOG.map(x=>`<li><b>${x[0]}</b> (${x[1]}): ${x[2]}</li>`).join('')}</ul><div class="row"><button class="b p" onclick="chkUpd()">Buscar actualización</button></div></div>`}
 function newer(a,b){const x=a.split('.').map(Number),y=b.split('.').map(Number);for(let i=0;i<3;i++){if((x[i]||0)>(y[i]||0))return true;if((x[i]||0)<(y[i]||0))return false}return false}
 async function chkUpd(){dlg('Buscando actualización...','<div>Consultando...</div>');
@@ -352,7 +437,7 @@ function setNav(){const n=$('#nav'),f=$('#fab'),dn=$('#donar');if(dn)dn.style.di
 function go(t){tab=t==='nt'?(inN()?tab:'pro'):t;if(t==='cob')ck=null;R();scrollTo(0,0)}
 function fab(){if(!cur)return addCourse();if(tab==='est')return stMenu();if(tab==='cob')return addCob();if(GT.includes(tab))return addItem(tab)}
 function closeD(){$('#dlg').style.display='none'}
-function stMenu(){dlg('Agregar alumnos','<div class="col"><button class="b p" onclick="closeD();scanSt()">📷 Sacar foto con la cámara</button><button class="b p" onclick="closeD();pickSt()">🖼️ Elegir foto o archivo (PDF, Word, Excel...)</button><button class="b u" onclick="closeD();impSt()">Pegar o importar una lista</button><button class="b" onclick="closeD();addSt()">Agregar uno solo</button></div><p><small>Para leer mejor la foto: sacala de frente, con buena luz y, si podés, mostrando solo la columna de nombres.</small></p>')}
+function stMenu(){dlg('Agregar alumnos','<div class="col"><button class="b p" onclick="closeD();scanSt()">📷 Sacar foto con la cámara</button><button class="b p" onclick="closeD();pickSt()">🖼️ Elegir foto o archivo (PDF, Word, Excel...)</button><button class="b p" onclick="closeD();dictSt()">🎤 Dictar los nombres</button><button class="b u" onclick="closeD();impSt()">Pegar o importar una lista</button><button class="b" onclick="closeD();addSt()">Agregar uno solo</button></div><p><small>Para leer mejor la foto: sacala de frente, con buena luz y, si podés, mostrando solo la columna de nombres.</small></p>')}
 function emptyHome(){return `<div class="card"><h3>Empecemos</h3><ol class="steps"><li><span class="paso">1</span><div><b>Creá tu primer curso</b><br><small>Tocá el botón ＋ de abajo.</small></div></li><li><span class="paso">2</span><div><b>Cargá los alumnos</b><br><small>Con la cámara 📷 o pegando la lista.</small></div></li><li><span class="paso">3</span><div><b>Tomá asistencia y cargá notas</b><br><small>Todo se guarda solo.</small></div></li></ol></div>`}
 function perfCard(){return `<div class="card"><h3>Mis datos</h3><small>Sirven para saludarte y completar la escuela al crear cursos.</small>
 <label>Tu nombre</label><input value="${esc(S.cfg.teacher||'')}" onchange="S.cfg.teacher=this.value.trim();save()">
