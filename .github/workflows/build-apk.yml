@@ -30,7 +30,7 @@ jobs:
           java-version: 17
 
       - name: Instalar dependencias
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Armar carpeta web
         run: |
@@ -46,6 +46,11 @@ jobs:
 
       - name: Icono de la app
         run: unzip -o iconos.zip -d android/app/src/main/res/
+
+      - name: Datos de Google para Drive
+        run: |
+          sed -i 's#</resources>#    <string name="server_client_id">194777348944-a70meqde749mkjb2uk212g51kiiurc61.apps.googleusercontent.com</string>\n</resources>#' android/app/src/main/res/values/strings.xml
+          grep -n "server_client_id" android/app/src/main/res/values/strings.xml
 
       - name: Firma fija y numero de version
         run: |
