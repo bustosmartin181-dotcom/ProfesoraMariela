@@ -119,7 +119,7 @@ function est(c){return `<div class="card"><h3>Estudiantes</h3><small>${c.student
 function filt(q){q=q.toLowerCase();document.querySelectorAll('#lst .st').forEach(e=>e.style.display=e.dataset.n.includes(q)?'':'none')}
 function setCond(id,v){C().students.find(s=>s.id===id).cond=v;save()}
 function addSt(){dlg('Agregar estudiante','<input id="f1" placeholder="Apellido y nombre">','Agregar',()=>{if(!val('f1'))return false;C().students.push({id:uid(),name:val('f1'),cond:''});save();R()})}
-function impSt(){dlg('Importar lista','<small>Pegá la lista: un nombre por línea, o el texto copiado del PDF del colegio (con DNI y curso). La app se queda solo con los nombres.</small><br><textarea id="f1" rows="9"></textarea>','Importar',()=>{addNames(parseNames(val('f1')))})}
+function impSt(){dlg('Importar lista','<small>Pegá la lista: un nombre por línea, o el texto copiado del PDF del colegio (con DNI y curso). La app se queda solo con los nombres.</small><br><textarea id="f1" rows="9"></textarea>','Revisar',()=>{const p=parseNamesEx(val('f1'));setTimeout(()=>review(p.items,p.dropped),0)})}
 function sortSt(){C().students.sort((a,b)=>a.name.localeCompare(b.name,'es'));save();R()}
 function renSt(id){const s=C().students.find(x=>x.id===id);dlg('Editar nombre',`<input id="f1" value="${esc(s.name)}">`,'Guardar',()=>{if(!val('f1'))return false;s.name=val('f1');save();R()})}
 function delSt(id){const s=C().students.find(x=>x.id===id);dlg('Eliminar estudiante',`¿Quitar a ${esc(s.name)} de este curso? Se borran sus registros acá.`,'Eliminar',()=>{const c=C();c.students=c.students.filter(x=>x.id!==id);save();R()})}
@@ -179,11 +179,26 @@ function backup(){dlg('Copia de seguridad',`<small>Copiá todo este texto y guar
   try{const o=JSON.parse($('#f1').value);if(!o.courses)throw 0;S=o;S.cfg=S.cfg||{remind:7,last:0};save();cur=null;view='home';R()}catch(e){alert('El texto no es una copia válida.');return false}})}
 
 /* ---------- importar nombres (texto, PDF u OCR) ---------- */
-function parseNames(raw){
- const seen=new Set();
- return raw.replace(/(\d{7,8}\s*\d\s*[°º]\s*[A-Za-z])\s+/g,'$1\n').split('\n')
-  .map(x=>x.replace(/^\s*\d+\s*[.)\-–:]*\s*/,'').replace(/\d{7,8}.*$/,'').replace(/[|_]/g,' ').replace(/\s+/g,' ').trim())
-  .filter(x=>x.length>2&&/[A-Za-zÁ-ú]/.test(x)&&!/^alumnos?\b/i.test(x)&&!seen.has(x.toLowerCase())&&seen.add(x.toLowerCase()))}
+const HEADW=/\b(nombres?|alumn[oa]s?|apellidos?|cursos?|documentos?|dni|lista|planilla|materia|division|asistencia|profesor[a]?|docente|turno|ciclo|fecha|promedio|notas?|total|observaciones?|trabajos?|cuatrimestre|trimestre|escuela|colegio)\b/;
+const noacc=x=>x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const nl=x=>(x.match(/\p{L}/gu)||[]).length;
+function parseNamesEx(raw){const seen=new Set(),items=[];let dropped=0;
+ raw.replace(/(\d{7,8}\s*\d\s*[°º]\s*[A-Za-z])\s+/g,'$1\n').split('\n').forEach(l=>{
+  l=l.trim();if(!l)return;
+  if(HEADW.test(noacc(l))){dropped++;return}
+  l=l.replace(/^\s*\d+\s*[.)\-–:]*\s*/,'').replace(/\d{7,8}.*$/,'');
+  const t=l.split(/\s+/).filter(x=>nl(x)>0);
+  while(t.length>2&&nl(t[t.length-1])<=1)t.pop();
+  const n=t.join(' ').replace(/[|_\[\]{}]/g,'').trim();
+  if(n.length<3){if(/\p{L}{2}/u.test(l))dropped++;return}
+  const key=n.toLowerCase();if(seen.has(key))return;seen.add(key);
+  items.push({n,ok:!(t.length<2||/\d/.test(n)||n.length<5)})});
+ return {items,dropped}}
+const parseNames=raw=>parseNamesEx(raw).items.map(x=>x.n);
+function review(items,dropped){const ok=items.filter(x=>x.ok).length,dd=items.length-ok;
+ dlg('Revisá la lista',`<small>${ok} nombres listos${dd?' y '+dd+' para revisar (sin tildar, en amarillo)':''}.${dropped?' Se descartaron '+dropped+' líneas que parecían títulos o ruido.':''} Corregí o destildá lo que esté mal antes de agregar.</small>
+<div id="rv" style="margin-top:10px">${items.map(x=>`<div class="row" style="flex-wrap:nowrap;margin:6px 0"><input type="checkbox" class="ck" ${x.ok?'checked':''} style="width:26px;height:26px;padding:0;flex:none"><input class="rn" value="${esc(x.n)}" style="${x.ok?'':'background:var(--ye)'}"></div>`).join('')||'<p class="mu">No se encontraron nombres. Probá con otra foto.</p>'}</div>`,
+ 'Agregar los tildados',()=>{const out=[];document.querySelectorAll('#rv .row').forEach(r=>{if(r.querySelector('.ck').checked)out.push(r.querySelector('.rn').value)});addNames(out)})}
 function addNames(list){const c=C();const have=new Set(c.students.map(s=>s.name.toLowerCase()));
  list.forEach(x=>{x=x.replace(/\s+/g,' ').trim();if(x.length>2&&!have.has(x.toLowerCase())){have.add(x.toLowerCase());c.students.push({id:uid(),name:x,cond:''})}});save();R()}
 
@@ -196,10 +211,12 @@ function scanSt(){$('#cam').value='';$('#cam').click()}
 async function scanFile(inp){const f=inp.files[0];if(!f)return;
  dlg('Leyendo la lista...','<div id="ocrst">Preparando el lector de texto (la primera vez necesita internet)...</div>');
  try{await loadOcr();const img=await shrink(f);
-  const r=await Tesseract.recognize(img,'spa',{logger:m=>{const e=$('#ocrst');if(e&&m.status)e.textContent=m.status+(m.progress?' '+Math.round(m.progress*100)+'%':'')}});
-  const names=parseNames(r.data.text);
-  dlg('Revisá la lista','<small>'+names.length+' nombres leídos. Corregí lo que haga falta (un nombre por línea) antes de agregar.</small><br><textarea id="f1" rows="12">'+esc(names.join('\n'))+'</textarea>','Agregar',()=>{addNames($('#f1').value.split('\n'))})
- }catch(e){dlg('No se pudo leer','Revisá la conexión a internet (la primera vez baja el lector de texto) y probá con una foto bien iluminada y derecha. Mientras tanto podés usar «Importar lista».')}}
+  const lg=m=>{const e=$('#ocrst');if(e&&m.status)e.textContent=m.status+(m.progress?' '+Math.round(m.progress*100)+'%':'')};
+  const w=await Tesseract.createWorker('spa',1,{logger:lg});
+  try{await w.setParameters({tessedit_pageseg_mode:'6'})}catch(e){}
+  const r=await w.recognize(img);try{await w.terminate()}catch(e){}
+  const p=parseNamesEx(r.data.text);review(p.items,p.dropped)
+ }catch(e){dlg('No se pudo leer','Revisá la conexión a internet (la primera vez baja el lector de texto) y probá con una foto bien iluminada y derecha. Mientras tanto podés usar «Pegar o importar una lista».')}}
 
 /* ---------- guardado automático + copias ---------- */
 const SK='planilla_docente_snaps';
@@ -246,8 +263,8 @@ ${sn.map(x=>`<div class="st"><span class="nm">${fdt(x.t)}</span><button class="b
 <div class="card"><h3>Copia por texto</h3><small>Alternativa si no podés guardar archivos.</small><div class="row" style="margin-top:8px"><button class="b" onclick="backup()">Ver y pegar texto</button></div></div>${perfCard()}${verCard()}</main>`}
 
 /* ---------- versión y actualizaciones ---------- */
-const APP_VERSION='2.0.1',APP_DATE='04/11/2026';
-const CHANGELOG=[['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
+const APP_VERSION='2.0.2',APP_DATE='04/11/2026';
+const CHANGELOG=[['2.0.2','06/11/2026','El lector de listas ignora títulos y números, y muestra una revisión con tildes antes de agregar alumnos.'],['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
 function verCard(){return `<div class="card"><h3>Versión de la app</h3><p><b>Versión ${APP_VERSION}</b> · ${APP_DATE}</p><small>Novedades:</small><ul style="margin:6px 0;padding-left:20px">${CHANGELOG.map(x=>`<li><b>${x[0]}</b> (${x[1]}): ${x[2]}</li>`).join('')}</ul><div class="row"><button class="b p" onclick="chkUpd()">Buscar actualización</button></div></div>`}
 function newer(a,b){const x=a.split('.').map(Number),y=b.split('.').map(Number);for(let i=0;i<3;i++){if((x[i]||0)>(y[i]||0))return true;if((x[i]||0)<(y[i]||0))return false}return false}
 async function chkUpd(){dlg('Buscando actualización...','<div>Consultando...</div>');
@@ -272,7 +289,7 @@ function setNav(){const n=$('#nav'),f=$('#fab');
 function go(t){tab=t==='nt'?(inN()?tab:'pro'):t;if(t==='cob')ck=null;R();scrollTo(0,0)}
 function fab(){if(!cur)return addCourse();if(tab==='est')return stMenu();if(tab==='cob')return addCob();if(GT.includes(tab))return addItem(tab)}
 function closeD(){$('#dlg').style.display='none'}
-function stMenu(){dlg('Agregar alumnos','<div class="col"><button class="b p" onclick="closeD();scanSt()">📷 Escanear lista con la cámara</button><button class="b u" onclick="closeD();impSt()">Pegar o importar una lista</button><button class="b" onclick="closeD();addSt()">Agregar uno solo</button></div>')}
+function stMenu(){dlg('Agregar alumnos','<div class="col"><button class="b p" onclick="closeD();scanSt()">📷 Escanear lista con la cámara</button><button class="b u" onclick="closeD();impSt()">Pegar o importar una lista</button><button class="b" onclick="closeD();addSt()">Agregar uno solo</button></div><p><small>Para leer mejor la foto: sacala de frente, con buena luz y, si podés, mostrando solo la columna de nombres.</small></p>')}
 function emptyHome(){return `<div class="card"><h3>Empecemos</h3><ol class="steps"><li><span class="paso">1</span><div><b>Creá tu primer curso</b><br><small>Tocá el botón ＋ de abajo.</small></div></li><li><span class="paso">2</span><div><b>Cargá los alumnos</b><br><small>Con la cámara 📷 o pegando la lista.</small></div></li><li><span class="paso">3</span><div><b>Tomá asistencia y cargá notas</b><br><small>Todo se guarda solo.</small></div></li></ol></div>`}
 function perfCard(){return `<div class="card"><h3>Mis datos</h3><small>Sirven para saludarte y completar la escuela al crear cursos.</small>
 <label>Tu nombre</label><input value="${esc(S.cfg.teacher||'')}" onchange="S.cfg.teacher=this.value.trim();save()">
