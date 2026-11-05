@@ -72,7 +72,7 @@ const KEY='planilla_docente_v1';
 let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!S||!S.courses)S={courses:[],period:'2c'};
 S.cfg=S.cfg||{remind:7,last:0};
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.driveSoon)driveSoon()};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -307,11 +307,11 @@ ${sn.map(x=>`<div class="st"><span class="nm">${fdt(x.t)}</span><button class="b
 <p><small>Última copia en archivo: ${L?fdt(L):'nunca'}</small></p>
 <small>Recordarme hacer una copia:</small><select onchange="S.cfg.remind=+this.value;save()">${[[0,'Nunca'],[7,'Cada 7 días'],[15,'Cada 15 días'],[30,'Cada 30 días']].map(o=>`<option value="${o[0]}" ${S.cfg.remind===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>
 <div class="card"><h3>Copia en Google Drive</h3><small>Todavía no está activa. Es el próximo paso: iniciar sesión con la cuenta de Google de Mariela y que la copia se suba sola a su Drive.</small></div>
-<div class="card"><h3>Copia por texto</h3><small>Alternativa si no podés guardar archivos.</small><div class="row" style="margin-top:8px"><button class="b" onclick="backup()">Ver y pegar texto</button></div></div>${perfCard()}${conoceCard()}${donarCard()}${verCard()}</main>`}
+<div class="card"><h3>Copia por texto</h3><small>Alternativa si no podés guardar archivos.</small><div class="row" style="margin-top:8px"><button class="b" onclick="backup()">Ver y pegar texto</button></div></div>${perfCard()}${driveCard()}${conoceCard()}${donarCard()}${verCard()}</main>`}
 
 /* ---------- versión y actualizaciones ---------- */
-const APP_VERSION='2.1.1',APP_DATE='05/11/2026';
-const CHANGELOG=[['2.1.1','05/11/2026','Sección «Conocé la app» (escondida en Ajustes) y curso de ejemplo para probar o sacar capturas.'],['2.1.0','05/11/2026','Exportar notas y promedios a Excel para imprimir (un curso o todos) y dictar alumnos con el micrófono del teclado.'],['2.0.9','05/11/2026','Ahora lee fotos en formato HEIC (las del Samsung) convirtiéndolas solas.'],['2.0.8','05/11/2026','Lectura de PDF más robusta y los errores de lectura ahora muestran el detalle técnico.'],['2.0.7','05/11/2026','Ventanita «Ayudemos al creador» con alias para copiar y botón para abrir Mercado Pago.'],['2.0.6','06/11/2026','Agregar alumnos desde PDF, Word, Excel, LibreOffice, RTF, HTML, texto y fotos.'],['2.0.5','06/11/2026','Agregar alumnos: se puede elegir una foto de la galería o un archivo de texto, además de sacar la foto con la cámara.'],['2.0.4','06/11/2026','Corrige pantalla en blanco al abrir la app instalada.'],['2.0.3','06/11/2026','Ícono nuevo y APK con firma fija para poder actualizar encima.'],['2.0.2','06/11/2026','El lector de listas ignora títulos y números, y muestra una revisión con tildes antes de agregar alumnos.'],['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
+const APP_VERSION='2.2.0',APP_DATE='05/11/2026';
+const CHANGELOG=[['2.2.0','05/11/2026','Copia automática en Google Drive (Ajustes → Copia en Google Drive).'],['2.1.1','05/11/2026','Sección «Conocé la app» (escondida en Ajustes) y curso de ejemplo para probar o sacar capturas.'],['2.1.0','05/11/2026','Exportar notas y promedios a Excel para imprimir (un curso o todos) y dictar alumnos con el micrófono del teclado.'],['2.0.9','05/11/2026','Ahora lee fotos en formato HEIC (las del Samsung) convirtiéndolas solas.'],['2.0.8','05/11/2026','Lectura de PDF más robusta y los errores de lectura ahora muestran el detalle técnico.'],['2.0.7','05/11/2026','Ventanita «Ayudemos al creador» con alias para copiar y botón para abrir Mercado Pago.'],['2.0.6','06/11/2026','Agregar alumnos desde PDF, Word, Excel, LibreOffice, RTF, HTML, texto y fotos.'],['2.0.5','06/11/2026','Agregar alumnos: se puede elegir una foto de la galería o un archivo de texto, además de sacar la foto con la cámara.'],['2.0.4','06/11/2026','Corrige pantalla en blanco al abrir la app instalada.'],['2.0.3','06/11/2026','Ícono nuevo y APK con firma fija para poder actualizar encima.'],['2.0.2','06/11/2026','El lector de listas ignora títulos y números, y muestra una revisión con tildes antes de agregar alumnos.'],['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
 
 /* ---------- Ayudemos al creador ---------- */
 const CREADOR={nombre:'Martín Enrique Bustos',alias:'MartinchoLujanino'};
@@ -413,6 +413,50 @@ function demoAdd(){if(S.courses.some(c=>c.demo))return dlg('Ya existe','El curso
  c.cob.push(k);S.courses.push(c);save();view='home';cur=null;R();dlg('Listo','Se creó el curso <b>Ejemplo 3.º A</b> con alumnos inventados. Lo ves en «Cursos».')}
 function demoDel(){const n=S.courses.filter(c=>c.demo).length;if(!n)return dlg('Sin curso de ejemplo','No hay ningún curso de ejemplo para borrar.');
  dlg('Borrar curso de ejemplo','Se borra solo el curso de ejemplo. Tus cursos reales no se tocan.','Borrar',()=>{S.courses=S.courses.filter(c=>!c.demo);if(cur&&!C()){cur=null}save();R()})}
+
+/* ---------- Copia en Google Drive ---------- */
+const GCID='194777348944-a70meqde749mkjb2uk212g51kiiurc61.apps.googleusercontent.com';
+const GSCOPES=['profile','email','https://www.googleapis.com/auth/drive.file'];
+const DRIVE_FILE='planilla-docente-copia.json';
+let gaTok=null,gaTimer=null,gaPend=false,gaBusy=false;
+const gAuth=()=>Capacitor.registerPlugin('GoogleAuth');
+const dOn=()=>isNative()&&S.cfg.drive&&S.cfg.drive.on;
+const errTxt=e=>String((e&&(e.message||e.error||e.code))||JSON.stringify(e)||e).slice(0,200);
+async function gaInit(){try{await gAuth().initialize({clientId:GCID,scopes:GSCOPES,grantOfflineAccess:true})}catch(e){}}
+async function gaToken(){if(gaTok)return gaTok;await gaInit();
+ try{const a=await gAuth().refresh();gaTok=a&&a.accessToken}catch(e){gaTok=null}
+ if(!gaTok){const u=await gAuth().signIn();gaTok=u&&u.authentication&&u.authentication.accessToken}
+ if(!gaTok)throw new Error('Google no devolvió permiso de acceso');return gaTok}
+async function dFetch(url,opt){opt=opt||{};const go=async t=>fetch(url,Object.assign({},opt,{headers:Object.assign({},opt.headers||{},{Authorization:'Bearer '+t})}));
+ let r=await go(await gaToken());if(r.status===401){gaTok=null;r=await go(await gaToken())}
+ if(!r.ok)throw new Error('Drive respondió '+r.status+': '+(await r.text()).slice(0,140));return r}
+async function dFind(){const q=encodeURIComponent("name='"+DRIVE_FILE+"' and trashed=false");
+ const j=await (await dFetch('https://www.googleapis.com/drive/v3/files?spaces=drive&fields=files(id,name,modifiedTime)&q='+q)).json();return(j.files&&j.files[0])||null}
+async function driveUp(silent){if(gaBusy)return;gaBusy=true;clearTimeout(gaTimer);gaPend=false;
+ try{const f=await dFind(),B='pdbound'+Date.now();
+  const body='--'+B+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(f?{}:{name:DRIVE_FILE,mimeType:'application/json'})+'\r\n--'+B+'\r\nContent-Type: application/json\r\n\r\n'+JSON.stringify(S)+'\r\n--'+B+'--';
+  await dFetch(f?'https://www.googleapis.com/upload/drive/v3/files/'+f.id+'?uploadType=multipart':'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:f?'PATCH':'POST',headers:{'Content-Type':'multipart/related; boundary='+B},body});
+  S.cfg.drive.last=Date.now();S.cfg.drive.err='';try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(!silent){R();dlg('Listo','La copia se guardó en tu Google Drive (archivo «'+DRIVE_FILE+'»).')}}
+ catch(e){if(S.cfg.drive){S.cfg.drive.err=errTxt(e);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}}
+  if(!silent)dlg('No se pudo subir a Drive','Revisá tu conexión a internet y probá de nuevo.<br><small style="opacity:.7">Detalle técnico: '+esc(errTxt(e))+'</small>')}
+ finally{gaBusy=false}}
+function driveSoon(){if(!dOn())return;gaPend=true;clearTimeout(gaTimer);gaTimer=setTimeout(()=>driveUp(true),30000)}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&gaPend&&dOn())driveUp(true)});
+async function driveConnect(){try{await gaInit();const u=await gAuth().signIn();gaTok=u&&u.authentication&&u.authentication.accessToken;
+  S.cfg.drive={on:true,email:(u&&u.email)||'',last:0,err:''};save();R();driveUp(false)}
+ catch(e){const m=errTxt(e);if(/cancel|12501|popup_closed/i.test(m))return;
+  dlg('No se pudo conectar con Google','No se completó el inicio de sesión.<br><small style="opacity:.7">Detalle técnico: '+esc(m)+'</small><br><br><small>Revisá que tu mail esté como «usuario de prueba» en Google Cloud y que el APK sea el instalado desde esta misma firma.</small>')}}
+async function driveOff(){try{await gAuth().signOut()}catch(e){}gaTok=null;S.cfg.drive=null;save();R()}
+async function driveDown(){try{const f=await dFind();if(!f)return dlg('Sin copia en Drive','Todavía no hay una copia guardada en este Drive. Primero subí una desde el otro teléfono o tocá «Subir copia ahora».');
+  const o=await (await dFetch('https://www.googleapis.com/drive/v3/files/'+f.id+'?alt=media')).json();if(!o.courses)throw new Error('El archivo de Drive no es una copia válida');
+  dlg('Restaurar desde Drive','La copia de Drive es del '+fdt(new Date(f.modifiedTime).getTime())+' y tiene '+o.courses.length+' cursos. Se reemplazan todos los datos actuales de este teléfono. ¿Seguir?','Restaurar',()=>{snap();const dv=S.cfg.drive;S=o;S.cfg=S.cfg||{remind:7,last:0};S.cfg.drive=dv;save();cur=null;view='home';R()})}
+ catch(e){dlg('No se pudo leer Drive','<small style="opacity:.7">Detalle técnico: '+esc(errTxt(e))+'</small>')}}
+function driveCard(){const d=S.cfg.drive;
+ if(!isNative())return `<div class="card"><h3>☁️ Copia en Google Drive</h3><small>Disponible en la app instalada en el teléfono (el APK). Acá, en el navegador, usá las copias en archivo.</small></div>`;
+ if(!d||!d.on)return `<div class="card"><h3>☁️ Copia en Google Drive</h3><small>Conectá tu cuenta de Google y la app sube sola una copia de todo a tu Drive cada vez que cambiás algo. Solo ve el archivo que ella misma crea, no el resto de tu Drive. Sirve para no perder nada si cambiás o perdés el teléfono, o para pasar tus datos a una tablet.</small><div class="row"><button class="b p" onclick="driveConnect()">Conectar con Google</button></div></div>`;
+ return `<div class="card"><h3>☁️ Copia en Google Drive</h3><p>Conectado${d.email?' como <b>'+esc(d.email)+'</b>':''}.</p><small>${d.last?'Última subida: '+fdt(d.last)+'.':'Todavía no se subió ninguna copia.'} Se sube sola unos segundos después de cada cambio.${d.err?'<br><b>Último error:</b> '+esc(d.err):''}</small>
+<div class="row" style="margin-top:8px"><button class="b p" onclick="driveUp(false)">Subir copia ahora</button><button class="b" onclick="driveDown()">Restaurar desde Drive</button><button class="b" onclick="driveOff()">Desconectar</button></div></div>`}
 function verCard(){return `<div class="card"><h3>Versión de la app</h3><p><b>Versión ${APP_VERSION}</b> · ${APP_DATE}</p><small>Novedades:</small><ul style="margin:6px 0;padding-left:20px">${CHANGELOG.map(x=>`<li><b>${x[0]}</b> (${x[1]}): ${x[2]}</li>`).join('')}</ul><div class="row"><button class="b p" onclick="chkUpd()">Buscar actualización</button></div></div>`}
 function newer(a,b){const x=a.split('.').map(Number),y=b.split('.').map(Number);for(let i=0;i<3;i++){if((x[i]||0)>(y[i]||0))return true;if((x[i]||0)<(y[i]||0))return false}return false}
 async function chkUpd(){dlg('Buscando actualización...','<div>Consultando...</div>');
