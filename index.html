@@ -212,7 +212,7 @@ async function shrink(f){const b=await createImageBitmap(f);const k=Math.min(1,2
 function scanSt(){$('#cam').value='';$('#cam').click()}
 function pickSt(){$('#gal').value='';$('#gal').click()}
 /* ---------- leer archivos de cualquier tipo ---------- */
-const CDN={zip:'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',pdf:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',pdfw:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'};
+const CDN={zip:'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',pdf:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',pdfw:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',heic:'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js'};
 const loadJs=src=>new Promise((ok,no)=>{const t=document.createElement('script');t.src=src;t.onload=ok;t.onerror=()=>no(new Error('sin internet'));document.head.appendChild(t)});
 const stat=m=>{const e=$('#ocrst');if(e)e.textContent=m};
 const unxml=x=>x.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&#(\d+);/g,(m,c)=>String.fromCharCode(+c)).replace(/&amp;/g,'&');
@@ -228,6 +228,7 @@ function xlsxRows(x,sst){const out=[];(x.match(/<row\b[\s\S]*?<\/row>/g)||[]).fo
  out.push(cs.filter(Boolean).join(' '))});return out.join('\n')}
 function rtfText(x){return x.replace(/\\'([0-9a-f]{2})/gi,(m,h)=>String.fromCharCode(parseInt(h,16))).replace(/\\par[d]?\b/g,'\n').replace(/\\(?:tab|cell)\b/g,' ').replace(/\\row\b/g,'\n').replace(/\\[a-z]+-?\d* ?/gi,'').replace(/[{}]/g,'')}
 function htmlText(x){return unxml(x.replace(/<(script|style)[\s\S]*?<\/\1>/gi,'').replace(/<\/t[dh]>/gi,' ').replace(/<\/(p|div|tr|li|h\d)>|<br\s*\/?>/gi,'\n'))}
+async function heicToJpg(f){stat('Convirtiendo la foto HEIC...');if(!window.heic2any)await loadJs(CDN.heic);let r=await heic2any({blob:f,toType:'image/jpeg',quality:.9});if(Array.isArray(r))r=r[0];return new File([r],'foto.jpg',{type:'image/jpeg'})}
 async function zipOf(f){if(!window.JSZip)await loadJs(CDN.zip);return JSZip.loadAsync(await f.arrayBuffer())}
 async function docxText(f){const z=await zipOf(f);const d=z.file('word/document.xml');if(!d)throw new Error('formato');return docxXml(await d.async('string'))}
 async function odText(f){const z=await zipOf(f);const d=z.file('content.xml');if(!d)throw new Error('formato');return odXml(await d.async('string'))}
@@ -251,7 +252,7 @@ async function scanFile(inp){const f=inp.files[0];if(!f)return;const nm=f.name||
  if(/^(doc|xls|ppt|pages|numbers)$/.test(ext)){dlg('Formato no compatible','Ese formato viejo no se puede leer directo. Abrilo en su programa y guardalo como <b>.docx</b>, <b>.xlsx</b> o <b>PDF</b> (Guardar como), o copiá los nombres y usá «Pegar o importar una lista».');return}
  dlg('Leyendo el archivo...','<div id="ocrst">Preparando (la primera vez de cada tipo necesita internet)...</div>');
  try{let text='';
-  if(/^image\//.test(ty)||/^(jpe?g|png|webp|bmp|gif|heic|heif)$/.test(ext)){stat('Preparando la foto...');text=await ocrCanvases([await shrink(f)])}
+  if(/^image\//.test(ty)||/^(jpe?g|png|webp|bmp|gif|heic|heif)$/.test(ext)){stat('Preparando la foto...');let img=f;if(/^(heic|heif)$/.test(ext)||/hei[cf]/i.test(ty))img=await heicToJpg(f);text=await ocrCanvases([await shrink(img)])}
   else if(ext==='pdf'||ty==='application/pdf')text=await pdfText(f);
   else if(ext==='docx')text=await docxText(f);
   else if(ext==='xlsx'||ext==='xlsm')text=await xlsxText(f);
@@ -308,8 +309,8 @@ ${sn.map(x=>`<div class="st"><span class="nm">${fdt(x.t)}</span><button class="b
 <div class="card"><h3>Copia por texto</h3><small>Alternativa si no podés guardar archivos.</small><div class="row" style="margin-top:8px"><button class="b" onclick="backup()">Ver y pegar texto</button></div></div>${perfCard()}${donarCard()}${verCard()}</main>`}
 
 /* ---------- versión y actualizaciones ---------- */
-const APP_VERSION='2.0.8',APP_DATE='05/11/2026';
-const CHANGELOG=[['2.0.8','05/11/2026','Lectura de PDF más robusta y los errores de lectura ahora muestran el detalle técnico.'],['2.0.7','05/11/2026','Ventanita «Ayudemos al creador» con alias para copiar y botón para abrir Mercado Pago.'],['2.0.6','06/11/2026','Agregar alumnos desde PDF, Word, Excel, LibreOffice, RTF, HTML, texto y fotos.'],['2.0.5','06/11/2026','Agregar alumnos: se puede elegir una foto de la galería o un archivo de texto, además de sacar la foto con la cámara.'],['2.0.4','06/11/2026','Corrige pantalla en blanco al abrir la app instalada.'],['2.0.3','06/11/2026','Ícono nuevo y APK con firma fija para poder actualizar encima.'],['2.0.2','06/11/2026','El lector de listas ignora títulos y números, y muestra una revisión con tildes antes de agregar alumnos.'],['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
+const APP_VERSION='2.0.9',APP_DATE='05/11/2026';
+const CHANGELOG=[['2.0.9','05/11/2026','Ahora lee fotos en formato HEIC (las del Samsung) convirtiéndolas solas.'],['2.0.8','05/11/2026','Lectura de PDF más robusta y los errores de lectura ahora muestran el detalle técnico.'],['2.0.7','05/11/2026','Ventanita «Ayudemos al creador» con alias para copiar y botón para abrir Mercado Pago.'],['2.0.6','06/11/2026','Agregar alumnos desde PDF, Word, Excel, LibreOffice, RTF, HTML, texto y fotos.'],['2.0.5','06/11/2026','Agregar alumnos: se puede elegir una foto de la galería o un archivo de texto, además de sacar la foto con la cámara.'],['2.0.4','06/11/2026','Corrige pantalla en blanco al abrir la app instalada.'],['2.0.3','06/11/2026','Ícono nuevo y APK con firma fija para poder actualizar encima.'],['2.0.2','06/11/2026','El lector de listas ignora títulos y números, y muestra una revisión con tildes antes de agregar alumnos.'],['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
 
 /* ---------- Ayudemos al creador ---------- */
 const CREADOR={nombre:'Martín Enrique Bustos',alias:'MartinchoLujanino'};
