@@ -10,6 +10,8 @@ on:
       - 'sw.js'
       - 'package.json'
       - 'capacitor.config.json'
+      - 'iconos.zip'
+      - 'debug.keystore'
       - '.github/workflows/build-apk.yml'
 
 jobs:
@@ -38,9 +40,19 @@ jobs:
       - name: Crear proyecto Android
         run: npx cap add android
 
-      - name: Permiso de cámara
+      - name: Permiso de camara
         run: |
           sed -i 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>#' android/app/src/main/AndroidManifest.xml
+
+      - name: Icono de la app
+        run: unzip -o iconos.zip -d android/app/src/main/res/
+
+      - name: Firma fija y numero de version
+        run: |
+          mkdir -p ~/.android
+          cp debug.keystore ~/.android/debug.keystore
+          sed -i 's/versionCode 1/versionCode ${{ github.run_number }}/' android/app/build.gradle
+          grep -n "versionCode" android/app/build.gradle
 
       - name: Sincronizar
         run: npx cap sync android
