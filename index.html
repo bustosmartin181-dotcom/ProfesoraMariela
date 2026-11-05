@@ -93,7 +93,7 @@ const val=id=>($('#'+id).value||'').trim();
 
 function R(){$('#app').innerHTML=!S.cfg.welcomed?welcome():cur?course():view==='cfg'?cfg():home();setNav();document.body.classList.toggle('bgfoto',bgOn())}
 function home(){const hi=S.cfg.teacher?'Hola, '+S.cfg.teacher.split(' ')[0]:'Mis cursos';
-return `<main>${top(hi,S.cfg.school||'Planilla Docente')}${remBanner()}
+return `<main>${hdr(hi,S.cfg.school||'Planilla Docente')}${remBanner()}
 ${S.courses.length?S.courses.map(c=>`<div class="card cc" onclick="openC('${c.id}')"><div class="cn">${esc(c.name)}</div><small>${esc(c.school||'')} ${esc(c.turno||'')}</small><div class="cm">${c.students.length} alumnos</div></div>`).join(''):emptyHome()}${foot()}</main>`}
 function openC(id){cur=id;tab='est';R();scrollTo(0,0)}
 function back(){cur=null;R()}
@@ -103,7 +103,7 @@ function addCourse(){dlg('Nuevo curso',`<input id="f1" placeholder="Materia y cu
 function delCourse(){dlg('Eliminar curso','¿Seguro? Se borran alumnos, asistencia y notas de este curso.','Eliminar',()=>{S.courses=S.courses.filter(c=>c.id!==cur);cur=null;save();R()})}
 
 function course(){const c=C(),isN=GT.includes(tab)||tab==='pro';
-return `<main>${top(c.name,(c.school||'')+(c.turno?' · '+c.turno:''),'back()')}
+return `<main>${hdr(c.name,(c.school||'')+(c.turno?' · '+c.turno:''),'back()')}
 ${isN?`<div class="chips">${GT.concat('pro').map(t=>`<button class="chip ${tab===t?'on':''}" onclick="tab='${t}';R()">${GS[t]}</button>`).join('')}</div>`:''}
 ${tab==='cob'?'':`<select onchange="S.period=this.value;save();R()" style="margin-bottom:14px">${Object.keys(PER).map(k=>`<option value="${k}" ${S.period===k?'selected':''}>${PER[k]}</option>`).join('')}</select>`}
 ${({est,asi,pro,inf,cob})[tab]?({est,asi,pro,inf,cob})[tab](c):grades(c,tab)}
@@ -250,7 +250,7 @@ function bkRestore(inp){const f=inp.files[0];if(!f)return;const r=new FileReader
 function remBanner(){const r=S.cfg.remind;if(!r||!S.courses.length)return'';const L=S.cfg.last;const d=L?Math.floor((Date.now()-L)/864e5):null;if(d!==null&&d<r)return'';
  return `<div class="card" style="background:var(--ye)"><b>${d===null?'Todavía no hiciste una copia en archivo.':'Hace '+d+' días que no hacés una copia en archivo.'}</b><br><button class="b" style="margin-top:8px" onclick="view='cfg';R()">Hacer copia ahora</button></div>`}
 function cfg(){const L=S.cfg.last,sn=getSnaps();
-return `<main>${top('Ajustes','Copias, datos y versión',"view='home';R()")}
+return `<main>${hdr('Ajustes','Copias, datos y versión',"view='home';R()")}
 <div class="card"><h3>Guardado automático</h3><small>Todo lo que cargás se guarda solo, al instante. Además, cada vez que cerrás o salís de la app se crea una copia (se guardan las últimas 5). No hace falta tocar «Guardar».</small>
 <p><b>Última copia automática:</b> ${sn.length?fdt(sn[0].t):'todavía ninguna'}</p>
 ${sn.map(x=>`<div class="st"><span class="nm">${fdt(x.t)}</span><button class="b" onclick="restSnap(${x.t})">Restaurar</button></div>`).join('')}</div>
@@ -263,8 +263,8 @@ ${sn.map(x=>`<div class="st"><span class="nm">${fdt(x.t)}</span><button class="b
 <div class="card"><h3>Copia por texto</h3><small>Alternativa si no podés guardar archivos.</small><div class="row" style="margin-top:8px"><button class="b" onclick="backup()">Ver y pegar texto</button></div></div>${perfCard()}${verCard()}</main>`}
 
 /* ---------- versión y actualizaciones ---------- */
-const APP_VERSION='2.0.2',APP_DATE='04/11/2026';
-const CHANGELOG=[['2.0.2','06/11/2026','El lector de listas ignora títulos y números, y muestra una revisión con tildes antes de agregar alumnos.'],['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
+const APP_VERSION='2.0.4',APP_DATE='04/11/2026';
+const CHANGELOG=[['2.0.4','06/11/2026','Corrige pantalla en blanco al abrir la app instalada.'],['2.0.3','06/11/2026','Ícono nuevo y APK con firma fija para poder actualizar encima.'],['2.0.2','06/11/2026','El lector de listas ignora títulos y números, y muestra una revisión con tildes antes de agregar alumnos.'],['2.0.1','05/11/2026','Cobros: pagos en partes y monto distinto por alumno.'],['2.0.0','05/11/2026','Diseño nuevo, menú inferior, botón ＋, pantallas de bienvenida, datos del docente y sección Cobros (fotocopias y resmas).'],['1.3.0','04/11/2026','Preparada para generar el APK de Android (copia en archivo con compartir nativo).'],['1.2.0','04/11/2026','Pantalla de versión y buscador de actualizaciones.'],['1.1.0','04/11/2026','Cámara para escanear listas, Ajustes y copias automáticas.'],['1.0.0','04/11/2026','Cursos, estudiantes, asistencia, notas, planilla de notas e informes.']];
 function verCard(){return `<div class="card"><h3>Versión de la app</h3><p><b>Versión ${APP_VERSION}</b> · ${APP_DATE}</p><small>Novedades:</small><ul style="margin:6px 0;padding-left:20px">${CHANGELOG.map(x=>`<li><b>${x[0]}</b> (${x[1]}): ${x[2]}</li>`).join('')}</ul><div class="row"><button class="b p" onclick="chkUpd()">Buscar actualización</button></div></div>`}
 function newer(a,b){const x=a.split('.').map(Number),y=b.split('.').map(Number);for(let i=0;i<3;i++){if((x[i]||0)>(y[i]||0))return true;if((x[i]||0)<(y[i]||0))return false}return false}
 async function chkUpd(){dlg('Buscando actualización...','<div>Consultando...</div>');
@@ -279,7 +279,7 @@ const NAVC=[['est','Alumnos'],['asi','Asistencia'],['nt','Notas'],['cob','Cobros
 const inN=()=>GT.includes(tab)||tab==='pro';
 const bgOn=()=>S.cfg.bg===undefined?/santa mar[ií]a|champagnat/i.test(S.cfg.school||''):!!S.cfg.bg;
 const foot=()=>`<div class="copyright">Planilla Docente v${APP_VERSION} · © 2026 Martín Enrique Bustos</div>`;
-function top(t,sub,back){return `<div class="top">${back?`<button class="ico" onclick="${back}" aria-label="Volver">←</button>`:'<div class="logo">PD</div>'}<div class="tt"><h1>${esc(t)}</h1>${sub?`<small>${esc(sub)}</small>`:''}</div></div>`}
+function hdr(t,sub,back){return `<div class="top">${back?`<button class="ico" onclick="${back}" aria-label="Volver">←</button>`:'<div class="logo">PD</div>'}<div class="tt"><h1>${esc(t)}</h1>${sub?`<small>${esc(sub)}</small>`:''}</div></div>`}
 function setNav(){const n=$('#nav'),f=$('#fab');
  if(!S.cfg.welcomed){n.style.display='none';f.style.display='none';return}
  n.style.display='flex';
