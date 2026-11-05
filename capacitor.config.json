@@ -1,0 +1,8 @@
+{
+  "appId": "com.planilladocente.app",
+  "appName": "Planilla Docente",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
