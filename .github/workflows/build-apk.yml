@@ -14,6 +14,9 @@ on:
       - 'debug.keystore'
       - '.github/workflows/build-apk.yml'
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -44,6 +47,11 @@ jobs:
         run: |
           sed -i 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>#' android/app/src/main/AndroidManifest.xml
 
+      - name: Permiso de microfono
+        run: |
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <queries>\n        <intent>\n            <action android:name="android.speech.RecognitionService" />\n        </intent>\n    </queries>\n</manifest>#' android/app/src/main/AndroidManifest.xml
+          grep -n "RECORD_AUDIO\|RecognitionService" android/app/src/main/AndroidManifest.xml
+
       - name: Icono de la app
         run: unzip -o iconos.zip -d android/app/src/main/res/
 
@@ -72,6 +80,10 @@ jobs:
           }
           EOF
 
+      - name: Dictado por voz (opcional)
+        run: |
+          npm install @capacitor-community/speech-recognition@^6.0.0 --legacy-peer-deps || echo "AVISO: no se pudo instalar el dictado por voz; la app usa el microfono del teclado"
+
       - name: Sincronizar
         run: npx cap sync android
 
@@ -93,3 +105,12 @@ jobs:
         with:
           name: planilla-docente-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publicar el APK como Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          V=$(grep -o "APP_VERSION='[0-9.]*'" index.html | grep -o "[0-9][0-9.]*")
+          echo "Version de la app: $V"
+          cp android/app/build/outputs/apk/debug/app-debug.apk PlanillaDocente.apk
+          gh release create "v${V}-b${{ github.run_number }}" PlanillaDocente.apk --title "Planilla Docente ${V}" --notes "APK de la version ${V} (compilacion ${{ github.run_number }})." --latest
