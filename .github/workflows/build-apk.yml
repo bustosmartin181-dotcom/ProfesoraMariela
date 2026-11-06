@@ -49,7 +49,7 @@ jobs:
 
       - name: Permiso de microfono
         run: |
-          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <queries>\n        <intent>\n            <action android:name="android.speech.RecognitionService" />\n        </intent>\n    </queries>\n</manifest>#' android/app/src/main/AndroidManifest.xml
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <queries>\n        <intent>\n            <action android:name="android.speech.RecognitionService" />\n        </intent>\n        <package android:name="com.mercadopago.wallet" />\n    </queries>\n</manifest>#' android/app/src/main/AndroidManifest.xml
           grep -n "RECORD_AUDIO\|RecognitionService" android/app/src/main/AndroidManifest.xml
 
       - name: Icono de la app
@@ -80,9 +80,10 @@ jobs:
           }
           EOF
 
-      - name: Dictado por voz (opcional)
+      - name: Complementos opcionales (dictado por voz y abrir Mercado Pago)
         run: |
           npm install @capacitor-community/speech-recognition@^6.0.0 --legacy-peer-deps || echo "AVISO: no se pudo instalar el dictado por voz; la app usa el microfono del teclado"
+          npm install @capacitor/app-launcher@latest-6 --legacy-peer-deps || echo "AVISO: no se pudo instalar el abridor de apps; el boton de Mercado Pago solo copia el alias"
 
       - name: Sincronizar
         run: npx cap sync android
