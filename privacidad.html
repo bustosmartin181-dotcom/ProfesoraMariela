@@ -10,13 +10,13 @@
 <h2>1. Qué datos guarda la app</h2>
 <p>La app guarda en el propio teléfono del usuario lo que él mismo carga: cursos, escuelas, nombres de alumnos, asistencia, notas, cobros e informes. Estos datos se guardan en el almacenamiento de la app, dentro del dispositivo. <b>No enviamos esos datos a ningún servidor del creador</b>: el creador no tiene servidores donde se guarden, no puede verlos y no los recibe.</p>
 
-<h2>2. Inicio de sesión con Google y copia en Google Drive (opcional)</h2>
-<p>Si el usuario decide activar la copia de seguridad, la app le pide iniciar sesión con su cuenta de Google y solicita estos permisos:</p>
+<h2>2. Inicio de sesión con Google y copia en Google Drive</h2>
+<p>Para usar la app, el usuario tiene que iniciar sesión con su cuenta de Google. Ese inicio de sesión sirve para identificar la cuenta en la app; no sube ni envía datos. Además, si el usuario activa la copia de seguridad, la app usa esa misma cuenta y solicita estos permisos:</p>
 <ul>
 <li><b>Nombre y correo electrónico</b> (permisos «profile» y «email»): solo para mostrar en la app con qué cuenta está conectado. No se envían a nadie más.</li>
 <li><b>Acceso a los archivos de Drive creados por la app</b> (permiso «drive.file»): la app crea y actualiza <i>un único archivo</i> llamado «planilla-docente-copia.json» en el Google Drive del usuario, con la copia de sus datos. La app <b>no puede ver ni modificar ningún otro archivo</b> del Drive.</li>
 </ul>
-<p>Ese archivo queda en la cuenta de Google del usuario, y solo él puede acceder. Sirve para recuperar sus datos si cambia o pierde el teléfono. Es una función opcional: la app funciona igual sin ella.</p>
+<p>Ese archivo queda en la cuenta de Google del usuario, y solo él puede acceder. Sirve para recuperar sus datos si cambia o pierde el teléfono. La copia en Drive es una función opcional: la app funciona igual sin ella.</p>
 <p>El uso de la información recibida de las APIs de Google se ajusta a la <a href="https://developers.google.com/terms/api-services-user-data-policy">Política de datos de usuario de los Servicios de API de Google</a>, incluidos los requisitos de uso limitado.</p>
 
 <h2>3. Fotos de listas de alumnos</h2>
@@ -24,7 +24,7 @@
 
 <h2>4. Servicios de terceros</h2>
 <ul>
-<li><b>Google</b> (inicio de sesión y Drive), solo si el usuario activa la copia.</li>
+<li><b>Google</b> (inicio de sesión obligatorio para usar la app, y Drive solo si el usuario activa la copia).</li>
 <li><b>Google Fonts, cdnjs y jsDelivr</b>, para cargar tipografías y librerías de la app.</li>
 <li><b>Mercado Pago</b>: la app incluye un botón opcional para colaborar con el creador, que abre la aplicación de Mercado Pago. No se procesan pagos dentro de la app.</li>
 </ul>
