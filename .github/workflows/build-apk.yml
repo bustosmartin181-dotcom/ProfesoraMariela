@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       KS_FILE: ${{ github.workspace }}/planilla.keystore
-      KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
-      KS_B64: ${{ secrets.KEYSTORE_BASE64 }}
+      KS_PASS_IN: ${{ secrets.KEYSTORE_PASSWORD }}
+      KS_B64_IN: ${{ secrets.KEYSTORE_BASE64 }}
     steps:
       - uses: actions/checkout@v4
 
@@ -65,12 +65,18 @@ jobs:
 
       - name: Firma fija y numero de version
         run: |
+          KS_PASS=$(printf '%s' "$KS_PASS_IN" | tr -d '[:space:]')
+          KS_B64=$(printf '%s' "$KS_B64_IN" | tr -d '[:space:]')
+          echo "Largo de la contrasena: ${#KS_PASS} (deberia ser 28)"
+          echo "Largo de la clave: ${#KS_B64} (deberia ser 3600)"
           if [ -z "$KS_B64" ] || [ -z "$KS_PASS" ]; then
             echo "ERROR: faltan los Secrets KEYSTORE_BASE64 y/o KEYSTORE_PASSWORD en GitHub (Settings > Secrets and variables > Actions)."
             exit 1
           fi
-          echo "$KS_B64" | base64 -d > "$KS_FILE"
-          keytool -list -keystore "$KS_FILE" -storepass "$KS_PASS" -alias planilla > /dev/null || { echo "ERROR: la clave o la contrasena de los Secrets no sirven"; exit 1; }
+          printf '%s' "$KS_B64" | base64 -d > "$KS_FILE" || { echo "ERROR: el Secret KEYSTORE_BASE64 no se pudo leer (esta cortado o tiene caracteres de mas)"; exit 1; }
+          echo "KS_PASS=$KS_PASS" >> "$GITHUB_ENV"
+          keytool -list -keystore "$KS_FILE" -storepass "$KS_PASS" -alias planilla > kt.log 2>&1 || { cat kt.log; echo "ERROR: la clave o la contrasena de los Secrets no sirven"; exit 1; }
+          echo "La clave de firma se abrio bien."
           sed -i 's/versionCode 1/versionCode ${{ github.run_number }}/' android/app/build.gradle
           grep -n "versionCode" android/app/build.gradle
           cat >> android/app/build.gradle <<'EOF'
