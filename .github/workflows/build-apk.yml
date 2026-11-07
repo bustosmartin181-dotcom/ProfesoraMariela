@@ -20,10 +20,8 @@ jobs:
   apk:
     runs-on: ubuntu-latest
     env:
-      KS_FILE: ${{ github.workspace }}/planilla.keystore
-      KS_PASS_IN: ${{ secrets.KEYSTORE_PASSWORD }}
-      KS_P1_IN: ${{ secrets.KEYSTORE_PARTE1 }}
-      KS_P2_IN: ${{ secrets.KEYSTORE_PARTE2 }}
+      KS_FILE: ${{ github.workspace }}/debug.keystore
+      KS_PASS: android
     steps:
       - uses: actions/checkout@v4
 
@@ -66,19 +64,8 @@ jobs:
 
       - name: Firma fija y numero de version
         run: |
-          KS_PASS=$(printf '%s' "$KS_PASS_IN" | tr -d '[:space:]')
-          KS_B64=$(printf '%s%s' "$KS_P1_IN" "$KS_P2_IN" | tr -d '[:space:]')
-          echo "Largo parte 1: $(printf '%s' "$KS_P1_IN" | tr -d '[:space:]' | wc -c) (deberia ser 1800)"
-          echo "Largo parte 2: $(printf '%s' "$KS_P2_IN" | tr -d '[:space:]' | wc -c) (deberia ser 1800)"
-          echo "Largo de la contrasena: ${#KS_PASS} (deberia ser 28)"
-          echo "Largo de la clave: ${#KS_B64} (deberia ser 3600)"
-          if [ -z "$KS_B64" ] || [ -z "$KS_PASS" ]; then
-            echo "ERROR: faltan los Secrets KEYSTORE_PARTE1, KEYSTORE_PARTE2 y/o KEYSTORE_PASSWORD en GitHub (Settings > Secrets and variables > Actions)."
-            exit 1
-          fi
-          printf '%s' "$KS_B64" | base64 -d > "$KS_FILE" || { echo "ERROR: los Secrets KEYSTORE_PARTE1 y KEYSTORE_PARTE2 no se pudieron leer (cortados o con caracteres de mas)"; exit 1; }
-          echo "KS_PASS=$KS_PASS" >> "$GITHUB_ENV"
-          keytool -list -keystore "$KS_FILE" -storepass "$KS_PASS" -alias planilla > kt.log 2>&1 || { cat kt.log; echo "ERROR: la clave o la contrasena de los Secrets no sirven"; exit 1; }
+          if [ ! -f "$KS_FILE" ]; then echo "ERROR: falta el archivo debug.keystore en el repositorio"; exit 1; fi
+          keytool -list -keystore "$KS_FILE" -storepass "$KS_PASS" -alias androiddebugkey > kt.log 2>&1 || { cat kt.log; echo "ERROR: no se pudo abrir debug.keystore"; exit 1; }
           echo "La clave de firma se abrio bien."
           sed -i 's/versionCode 1/versionCode ${{ github.run_number }}/' android/app/build.gradle
           grep -n "versionCode" android/app/build.gradle
@@ -89,7 +76,7 @@ jobs:
                   debug {
                       storeFile file(System.getenv("KS_FILE"))
                       storePassword System.getenv("KS_PASS")
-                      keyAlias "planilla"
+                      keyAlias "androiddebugkey"
                       keyPassword System.getenv("KS_PASS")
                   }
               }
@@ -112,10 +99,10 @@ jobs:
         run: |
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           A=$(keytool -printcert -jarfile $APK | grep 'SHA1:' | head -1 | awk '{print $2}')
-          K=$(keytool -list -v -keystore "$KS_FILE" -alias planilla -storepass "$KS_PASS" | grep 'SHA1:' | head -1 | awk '{print $2}')
+          K=$(keytool -list -v -keystore "$KS_FILE" -alias androiddebugkey -storepass "$KS_PASS" | grep 'SHA1:' | head -1 | awk '{print $2}')
           echo "Huella SHA-1 del APK:   $A"
           echo "Huella SHA-1 de la clave: $K"
-          if [ "$A" != "$K" ]; then echo "ERROR: el APK no quedo firmado con la clave de los Secrets"; exit 1; fi
+          if [ "$A" != "$K" ]; then echo "ERROR: el APK no quedo firmado con la clave del repositorio"; exit 1; fi
 
       - name: Guardar el APK
         uses: actions/upload-artifact@v4
